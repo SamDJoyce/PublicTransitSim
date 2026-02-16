@@ -41,7 +41,7 @@ class Vehicle(ABC):
     def current_stop(self):
         if self.route is None:
             raise ValueError("Vehicle has no assigned route.")
-        return self.route.stops()[self.current_stop_index]
+        return self.route.get_stop(self.current_stop_index)
 
     def has_next_stop(self) -> bool:
         if self.route is None:

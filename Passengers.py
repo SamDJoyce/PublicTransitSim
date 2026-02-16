@@ -1,4 +1,6 @@
 from typing import Optional
+from Routes import Stop
+
 
 # =========================== #
 # ===== Passenger Class ===== #
@@ -15,8 +17,8 @@ class Passenger:
     def __init__(
             self,
             passenger_id: int,
-            origin_stop: str,
-            destination_stop: str,
+            origin_stop: Stop,
+            destination_stop: Stop,
             arrival_time: int
     ):
         if origin_stop == destination_stop:
@@ -34,9 +36,15 @@ class Passenger:
     #   ===============
 
     def embark(self, time: int):
+        if self.embark_time is not None:
+            raise ValueError("Passenger has already embarked.")
         self.embark_time = time
 
     def disembark(self, time: int):
+        if self.embark_time is None:
+            raise ValueError("Passenger cannot disembark before embarking.")
+        if self.disembark_time is not None:
+            raise ValueError("Passenger has already disembarked.")
         self.disembark_time = time
 
     #   =========
@@ -66,3 +74,12 @@ class Passenger:
 
     def has_completed_trip(self) -> bool:
         return self.disembark_time is not None
+
+    #   =========
+    # || Helpers ||
+    #   =========
+    def is_destination(self, stop: Stop) -> bool:
+        """
+        Returns True if the provided stop is this passenger's destination.
+        """
+        return self.destination_stop == stop
