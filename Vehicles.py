@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, List
 
-from Routes import Route
+from Passengers import Passenger
+from Routes import Route, Stop
+from VehicleStates import State
 
 
 # ============================ #
@@ -16,9 +18,11 @@ class Vehicle(ABC):
         self.route = route
 
         self.current_stop_index = 0
-        self.embarked_passengers = 0
+        self.embarked_passengers: Optional[List[Passenger]] = []
+        self.current_passenger_count: int = 0
         self.total_passengers_carried = 0
         self.total_travel_time = 0
+        self.state = State.INIT
 
     #   =================
     # || Abstract Methods ||
@@ -53,48 +57,45 @@ class Vehicle(ABC):
             raise ValueError("Vehicle has no assigned route.")
         return self.route.is_last_stop(self.current_stop_index)
 
-    def depart_stop(self):
-        # Moves vehicle to its next stop and returns the adjusted travel time
-
-        # Check for last stop
-        if self.at_last_stop():
-            raise IndexError("Vehicle has reached end of route.")
-        #
-
-        travel_time = self.route.get_travel_time(self.current_stop_index)
-
-        adjusted_time = travel_time * self.speed()
-        self.total_travel_time += adjusted_time
-        self.current_stop_index += 1
-
-        return adjusted_time
-
     #   ====================
     # || Passenger Handling ||
     #   ====================
 
-    def embark_passengers(self, waiting_count: int) -> int:
+    def has_space(self) -> bool:
+        return (self.capacity() - self.current_passenger_count) > 0
+
+    def embark_passengers(self, queue: List[Passenger], current_time) -> List[Passenger]:
         """
-        Boards passengers up to vehicle capacity
-        Returns the number who actually boarded
+        Boards passengers up to vehicle capacity.
+        Returns the remaining passengers if any.
         """
+        remaining: List[Passenger] = []
+        for passenger in queue:
+            if self.has_space():
+                passenger.embark(current_time)
+                self.embarked_passengers.append(passenger)
+                self.current_passenger_count += 1
+                self.total_passengers_carried += 1
+            else:
+                remaining.append(passenger)
 
-        available_capacity = self.capacity() - self.embarked_passengers
-        boarded = min(waiting_count, available_capacity)
-        self.embarked_passengers += boarded
-        self.total_passengers_carried += boarded
+        return remaining
 
-        return boarded
-
-    def disembark_passengers(self, leaving_count: int) -> int:
+    def disembark_passengers(self, stop: Stop, current_time: int) -> List[Passenger]:
         """
         Removes passengers from the vehicle
-        Returns number who actually disembarked
+        Returns a list of Passengers who have completed their trip
         """
-
-        leaving = min(leaving_count, self.embarked_passengers)
-        self.embarked_passengers -= leaving
-        return leaving
+        remaining: List[Passenger] = []
+        disembarking:List[Passenger] = []
+        for passenger in self.embarked_passengers:
+            if passenger.at_destination(self.current_stop()):
+                passenger.disembark(current_time)
+                disembarking.append(passenger)
+            else:
+                remaining.append(passenger)
+        self.embarked_passengers = remaining
+        return disembarking
 
     def reset_route(self):
         self.current_stop_index = 0

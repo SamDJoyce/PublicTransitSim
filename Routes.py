@@ -17,7 +17,7 @@ class Stop:
     #   =============
     def __init__(self, name: str):
         self.name = name
-        self._waiting_passengers: Deque[Passenger] = deque()
+        self._waiting_passengers: List[Passenger] = []
 
         # Metrics
         self.total_arrivals = 0
@@ -41,24 +41,11 @@ class Stop:
     #   ==========
     # || Boarding ||
     #   ==========
-    def embark_passengers(self, vehicle, current_time: int) -> List[Passenger]:
-        """
-        Embarks waiting passengers onto vehicle.
-        Returns list of embarked passengers.
-        """
-        boarded_passengers = []
+    def get_waiting_passengers(self) -> List[Passenger]:
+        return self._waiting_passengers
 
-        while (
-            self.has_waiting_passengers()
-            and vehicle.embarked_passengers < vehicle.capacity()
-        ):
-            passenger = self._waiting_passengers.popleft()
-            passenger.embark(current_time)
-            vehicle.embarked_passengers += 1
-            vehicle.total_arrivals += 1
-            boarded_passengers.append(passenger)
-            self.total_boarded += 1
-        return boarded_passengers
+    def set_queue(self, passengers: List[Passenger]):
+        self._waiting_passengers = passengers
 
     # Ensure Stops can be compared
     def __str__(self):

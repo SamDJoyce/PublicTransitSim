@@ -78,7 +78,7 @@ class Passenger:
     #   =========
     # || Helpers ||
     #   =========
-    def is_destination(self, stop: Stop) -> bool:
+    def at_destination(self, stop: Stop) -> bool:
         """
         Returns True if the provided stop is this passenger's destination.
         """
