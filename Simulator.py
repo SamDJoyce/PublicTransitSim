@@ -9,7 +9,19 @@ class Simulator:
     def __init__(self):
         self.current_time = 0
         self.event_queue = []
+        self.route_queue = []
         self.completed_passengers: List[Passenger] = []
+
+    def get_next_route(self):
+        return heapq.heappop(self.route_queue)
+
+    def has_next_route(self) -> bool:
+        return len(self.route_queue) > 0
+
+    def get_time_to_next_route(self):
+        # TODO This should be dynamic
+        #  current value is a placeholder
+        return 10
 
     def schedule_event(self, event: Event):
         heapq.heappush(self.event_queue, event)

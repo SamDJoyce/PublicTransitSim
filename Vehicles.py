@@ -22,6 +22,8 @@ class Vehicle(ABC):
         self.current_passenger_count: int = 0
         self.total_passengers_carried = 0
         self.total_travel_time = 0
+        self.service_begin_time = 0
+        self.service_end_time = 0
         self.state = State.INIT
 
     #   =================
@@ -98,6 +100,10 @@ class Vehicle(ABC):
         return disembarking
 
     def reset_route(self):
+        self.current_stop_index = 0
+
+    def deassign(self):
+        self.route = None
         self.current_stop_index = 0
 
 # ======================== #

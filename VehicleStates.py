@@ -10,7 +10,6 @@ class State(Enum):
     IN_TRANSIT = auto()
     BREAKDOWN = auto()
     DELAYED = auto()
-    AT_FINAL_STOP = auto()
     ROUTE_COMPLETE = auto()
     OUT_OF_SERVICE = auto()
 
