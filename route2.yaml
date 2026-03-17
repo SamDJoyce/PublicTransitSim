@@ -1,0 +1,33 @@
+vehicles:
+  - id: 1
+    type: bus
+
+routes:
+  - id: R1
+    stops:
+      - name: Stop_A
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_B
+        travel_time: 10
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_C
+        travel_time: null
+        min_pass: 0
+        max_pass: 0
+  - id: R2
+    stops:
+      - name: Stop_Z
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_Y
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_X
+        travel_time: null
+        min_pass: 0
+        max_pass: 10

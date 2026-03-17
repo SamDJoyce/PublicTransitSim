@@ -48,8 +48,8 @@ class StartService(Event):
         vehicle.state = State.IDLE
         simulator.schedule_event(AssignRoute(current_time, vehicle))
         # Print information to the console
-        print(int(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " has entered service.")
+        print("\nTime = " + str(current_time))
+        print("Vehicle #" + str(vehicle.vehicle_id) + " has is now IN SERVICE.")
 
 class AssignRoute(Event):
     """
@@ -74,9 +74,8 @@ class AssignRoute(Event):
         vehicle.route = route
         vehicle.state = State.HEADING_TO_ROUTE_START
         # Print information to the console
-        print(current_time)
-        print("Vehicle #" + str(vehicle.vehicle_id) + " has been assigned route " + route.route_id + ".")
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
+        print("\nTime = " + str(current_time))
+        print("Vehicle #" + str(vehicle.vehicle_id) + " has been ASSIGNED ROUTE " + str(route.route_id) + ".")
 
         # Check to see if the vehicle is already at the first stop
         if vehicle.current_stop() == vehicle.route.get_stop(0):
@@ -103,9 +102,9 @@ class DeassignRoute(Event):
         vehicle = self.vehicle
         vehicle.state = State.IDLE
         # Print information to the console
-        print(current_time)
+        print("\nTime = " + str(current_time))
         print("Vehicle #" + str(vehicle.vehicle_id) + " has been removed from route " + str(vehicle.route.route_id) + ".")
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now IDLE.")
         vehicle.deassign()
 
         # Check to see if there are more routes assigned
@@ -134,9 +133,8 @@ class ArriveAtStop(Event):
         # Set vehicle state
         vehicle.state = State.AT_STOP
         # Print information to the console
-        print(current_time)
-        print("Vehicle #" + str(vehicle.vehicle_id) + " arrived at stop " + vehicle.current_stop().name + ".")
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
+        print("\nTime = " + str(current_time))
+        print("Vehicle #" + str(vehicle.vehicle_id) + " arrived AT STOP " + vehicle.current_stop().name + ".")
         # Begin dwelling at stop
         simulator.schedule_event(
             DwellAtStop(current_time, vehicle)
@@ -157,9 +155,12 @@ class DwellAtStop(Event):
         stop = vehicle.current_stop()
         # Set state
         self.vehicle.state = State.DWELL
+        # Print information to the console
+        print("\nTime = " + str(current_time))
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is DWELLING at stop " + vehicle.current_stop().name + ".")
 
         # Disembark Passengers
-        completed = vehicle.disembark_passengers(stop, current_time)
+        completed = vehicle.disembark_passengers(current_time)
         simulator.completed_passengers.extend(completed)
 
         # Embark Passengers
@@ -173,11 +174,6 @@ class DwellAtStop(Event):
         passenger_exchange_count = len(completed) + (len(waiting_queue)-len(remaining_queue))
         exchange_time = self.per_passenger_time * passenger_exchange_count
         adjusted_dwell = base_dwell + exchange_time
-
-        # Print information to the console
-        print(current_time)
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is at stop " + vehicle.current_stop().name + ".")
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
 
         # Schedule Departure
         if vehicle.has_next_stop():
@@ -207,15 +203,12 @@ class DepartStop(Event):
         # Check for valid next stop
         if vehicle.at_last_stop():
             raise IndexError("Vehicle cannot depart final stop: no next stop.")
-
-        # TODO conditional to check for delay or breakdown and direct down that route
         # Set State
         vehicle.state = State.IN_TRANSIT
 
         # Print information to the console
-        print(current_time)
-        print("Vehicle #" + str(vehicle.vehicle_id) + " departed stop " + vehicle.current_stop().name + ".")
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
+        print("\nTime = " + str(current_time))
+        print("Vehicle #" + str(vehicle.vehicle_id) + " DEPARTED STOP " + vehicle.current_stop().name + ".")
 
         # Get travel time to:
              # Route Start
@@ -261,10 +254,9 @@ class FinalDwellComplete(Event):
             raise RuntimeError("FinalDwellComplete triggered when not at last stop.")
         vehicle.state = State.ROUTE_COMPLETE
         # Print information to the console
-        print(current_time)
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is at stop " + vehicle.current_stop().name + ".")
-        print("This was the final stop on this vehicles current route.")
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
+        print("\nTime = " + str(current_time))
+        print("This was the FINAL STOP on this vehicles current route.")
+        print("Vehicle #" + str(vehicle.vehicle_id) + " has COMPLETED route " + str(vehicle.route.route_id))
         # TODO add possibility of route repeats,
         #  ie perform the same route 3 times in a row
         #  would schedule RestartRoute event
@@ -281,7 +273,7 @@ class RestartRoute(Event):
         self.vehicle = vehicle
 
     def process(self, simulator):
-        ... #TODO
+        pass #TODO
 
 
 class EndService(Event):
@@ -299,8 +291,8 @@ class EndService(Event):
         vehicle.service_end_time = current_time
         vehicle.state = State.OUT_OF_SERVICE
         # Print information to the console
-        print(current_time)
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
+        print("\nTime = " + str(current_time))
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now OUT OF SERVICE.")
 
 
 # ======================== #
@@ -320,8 +312,8 @@ class TrafficDelay(Event):
         vehicle.state = State.DELAYED
 
         # Print information to the console
-        print(current_time)
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
+        print("\nTime = " + str(current_time))
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now DELAYED")
 
         # Calculate length of delay
         delay_time = random.randrange(1,5)
@@ -347,8 +339,8 @@ class Breakdown(Event):
         vehicle.state = State.BREAKDOWN
 
         # Print information to the console
-        print(current_time)
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is experiencing a " + vehicle.state.__str__())
+        print("\nTime = " + str(current_time))
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is experiencing a BREAKDOWN.")
         if self.repairable:
             # Vehicle cannot be repaired
             print("Vehicle cannot be repaired.")
@@ -371,8 +363,8 @@ class RepairInProgress(Event):
         current_time = self.time
         vehicle.state = State.DELAYED
         # Print information to the console
-        print(current_time)
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is being repaired.")
+        print("\nTime = " + str(current_time))
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is BEING REPAIRED.")
 
         # Calculate length of delay
         delay_time = random.randrange(10,30)
@@ -393,8 +385,8 @@ class DelayComplete(Event):
         current_time = self.time
         vehicle.state = State.IN_TRANSIT
         # Print information to the console
-        print(current_time)
-        print("Vehicle #" + str(vehicle.vehicle_id) + " has completed its delay.")
+        print("\nTime = " + str(current_time))
+        print("Vehicle #" + str(vehicle.vehicle_id) + " has COMPLETED its DELAY.")
         # Schedule next event
         simulator.schedule_event(ArriveAtStop(current_time, vehicle))
 
@@ -414,5 +406,5 @@ class CannotRepair(Event):
         vehicle.service_end_time = current_time
         vehicle.state = State.OUT_OF_SERVICE
         # Print information to the console
-        print(current_time)
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
+        print("\nTime = " + str(current_time))
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now OUT OF SERVICE.")

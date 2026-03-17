@@ -78,12 +78,14 @@ class Vehicle(ABC):
                 self.embarked_passengers.append(passenger)
                 self.current_passenger_count += 1
                 self.total_passengers_carried += 1
+                print("Passenger " + str(passenger.passenger_id) + " has boarded vehicle " + str(self.vehicle_id) + ".")
             else:
                 remaining.append(passenger)
-
+        if len(remaining) > 0:
+            print(str(len(remaining)) + " passengers could not board.")
         return remaining
 
-    def disembark_passengers(self, stop: Stop, current_time: int) -> List[Passenger]:
+    def disembark_passengers(self, current_time: int) -> List[Passenger]:
         """
         Removes passengers from the vehicle
         Returns a list of Passengers who have completed their trip
@@ -94,6 +96,7 @@ class Vehicle(ABC):
             if passenger.at_destination(self.current_stop()):
                 passenger.disembark(current_time)
                 disembarking.append(passenger)
+                print("Passenger " + str(passenger.passenger_id) + " has has reached their destination " + self.current_stop().name + ".")
             else:
                 remaining.append(passenger)
         self.embarked_passengers = remaining
