@@ -1,95 +1,93 @@
 import os
 import sys
-from datetime import datetime
+
+import Events
+from Loader import Loader
+from Simulator import Simulator
 
 
-def clear_screen():
-    """Clears the console screen."""
-    os.system("cls" if os.name == "nt" else "clear")
+class MainMenu:
+    def __init__(self):
+        self.choice = None
+        self.config_loaded = False
+        self.simulation_run = False
+        self.config = None
+
+    def clear_screen(self):
+        """
+        Clear the console screen.
+        """
+        os.system("cls" if os.name == "nt" else "clear")
 
 
-def print_header():
-    print("=" * 60)
-    print("PUBLIC TRANSIT DISCRETE-EVENT SIMULATION SYSTEM".center(60))
-    print("=" * 60)
-    print(f"Session Start: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print("-" * 60)
+    def print_header(self):
+        print("=" * 60)
+        print("PUBLIC TRANSIT DISCRETE-EVENT SIMULATION SYSTEM".center(60))
+        print("=" * 60)
+        print("-" * 60)
 
 
-def print_main_menu():
-    print("\nMain Menu")
-    print("-" * 20)
-    print("1. Load Configuration File")
-    print("2. Run Simulation")
-    print("3. Export Metrics to CSV")
-    print("4. View Simulation Summary")
-    print("5. Exit")
-    print("-" * 20)
+    def print_main_menu(self):
+        print("\nMain Menu")
+        print("-" * 30)
+        print("1. Load Configuration File")
+        print("2. Run Simulation")
+        print("3. Exit")
+        print("-" * 30)
 
 
-def pause():
-    input("\nPress Enter to return to the main menu...")
+    def pause(self):
+        input("\nPress Enter to return to the main menu...")
 
-
-def main():
-    config_loaded = False
-    simulation_run = False
-
-    while True:
-        clear_screen()
-        print_header()
-        print_main_menu()
-
-        choice = input("Select an option (1-5): ").strip()
-
-        if choice == "1":
-            file_path = input("Enter YAML configuration file path: ").strip()
-            # Placeholder for actual loading logic
-            print(f"\nLoading configuration from '{file_path}'...")
+    def load_config(self):
+        file_path = input("Enter YAML configuration file path: ").strip()
+        print(f"\nLoading configuration from '{file_path}'...")
+        self.config = Loader(file_path)
+        if self.config is None:
+            print("Failed to load config file.")
+            return False
+        else:
             print("Configuration loaded successfully.")
-            config_loaded = True
-            pause()
+            return True
 
-        elif choice == "2":
-            if not config_loaded:
+    def run_simulation(self):
+        vehicles = self.config.vehicles
+        routes = self.config.routes
+        sim = Simulator(vehicles, routes)
+        for vehicle in sim.vehicles.values():
+            sim.schedule_event(Events.StartService(0,vehicle))
+        sim.run()
+
+
+    def choose(self):
+        self.choice = input("Select an option (1-3): ").strip()
+        # Load config file
+        if self.choice == "1":
+            self.config_loaded = self.load_config()
+            self.pause()
+        # Run the simulation
+        elif self.choice == "2":
+            if not self.config_loaded:
                 print("\nError: Load configuration before running simulation.")
+                self.pause()
             else:
-                print("\nSimulation running...")
-                print("[0] Bus-1 arrived at Central")
-                print("[2] Bus-1 departed Central")
-                print("[7] Bus-1 arrived at Main")
-                print("Simulation completed.")
-                simulation_run = True
-            pause()
-
-        elif choice == "3":
-            if not simulation_run:
-                print("\nError: Run simulation before exporting metrics.")
-            else:
-                print("\nExporting metrics to metrics.csv...")
-                print("Export complete.")
-            pause()
-
-        elif choice == "4":
-            if not simulation_run:
-                print("\nNo simulation data available.")
-            else:
-                print("\nSimulation Summary")
-                print("-" * 20)
-                print("Total Vehicles: 2")
-                print("Total Stops: 3")
-                print("Total Events: 6")
-                print("Average Route Time: 12 minutes")
-            pause()
-
-        elif choice == "5":
+                self.run_simulation()
+                self.pause()
+        elif self.choice == "3":
             print("\nExiting system. Goodbye.")
             sys.exit()
-
         else:
             print("\nInvalid selection. Please choose a valid option.")
-            pause()
+            self.pause()
 
+def main():
+    menu = MainMenu()
+    # Menu Loop
+    while True:
+        menu.clear_screen()
+        menu.print_header()
+        menu.print_main_menu()
+        menu.choose()
 
 if __name__ == "__main__":
     main()

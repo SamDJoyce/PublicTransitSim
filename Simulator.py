@@ -6,14 +6,18 @@ from Passengers import Passenger
 
 
 class Simulator:
-    def __init__(self):
+    def __init__(self, vehicles, routes):
+        self.vehicles     = vehicles
+        self.route_queue  = routes
         self.current_time = 0
-        self.event_queue = []
-        self.route_queue = []
+        self.event_queue  = []
         self.completed_passengers: List[Passenger] = []
 
     def get_next_route(self):
-        return heapq.heappop(self.route_queue)
+        if self.has_next_route():
+            return heapq.heappop(self.route_queue)
+        else:
+            return None
 
     def has_next_route(self) -> bool:
         return len(self.route_queue) > 0

@@ -1,5 +1,6 @@
-from typing import Optional
-from Routes import Stop
+from typing import Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from Routes import Stop
 
 
 # =========================== #
@@ -17,8 +18,8 @@ class Passenger:
     def __init__(
             self,
             passenger_id: int,
-            origin_stop: Stop,
-            destination_stop: Stop,
+            origin_stop: "Stop",
+            destination_stop: "Stop",
             arrival_time: int
     ):
         if origin_stop == destination_stop:
@@ -78,7 +79,7 @@ class Passenger:
     #   =========
     # || Helpers ||
     #   =========
-    def at_destination(self, stop: Stop) -> bool:
+    def at_destination(self, stop: "Stop") -> bool:
         """
         Returns True if the provided stop is this passenger's destination.
         """

@@ -22,7 +22,7 @@ class Vehicle(ABC):
         self.current_passenger_count: int = 0
         self.total_passengers_carried = 0
         self.total_travel_time = 0
-        self.service_begin_time = 0
+        self.service_start_time = 0
         self.service_end_time = 0
         self.state = State.INIT
 
@@ -38,7 +38,7 @@ class Vehicle(ABC):
         # Multiplier applied to travel time
 
     @abstractmethod
-    def capacity(self): pass
+    def capacity(self) -> int: pass
         # Maximum passenger capacity
 
     #   ==================
@@ -111,4 +111,17 @@ class Vehicle(ABC):
 # ======================== #
 
 class Bus(Vehicle):
-    pass
+    def __init__(self, vehicle_id: str, route: Optional[Route] = None, ):
+        super().__init__(vehicle_id, route)
+        self._dwell_time = 1
+        self._speed      = 1.0
+        self._capacity   = 60
+
+    def dwell_time(self) -> int:
+        return self._dwell_time
+
+    def speed(self) -> float:
+        return self._speed
+
+    def capacity(self) -> int:
+        return self._capacity

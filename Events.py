@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 from VehicleStates import State
+from Vehicles import Vehicle
 
 
 # ================================ #
@@ -20,10 +21,11 @@ class Event(ABC):
 
     @abstractmethod
     def process(self, simulator):
-        pass
         """
         Execute the event logic.
         """
+        pass
+
 
     def __lt__(self, other):
         return self.time < other.time
@@ -35,7 +37,7 @@ class StartService(Event):
     """
     Begin vehicle lifecycle
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
 
@@ -46,15 +48,14 @@ class StartService(Event):
         vehicle.state = State.IDLE
         simulator.schedule_event(AssignRoute(current_time, vehicle))
         # Print information to the console
-        print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " has entered service.")
-        print("Vehicle #" + vehicle.vehicle_id + " is now " + vehicle.state.__str__())
+        print(int(current_time))
+        print("Vehicle #" + str(vehicle.vehicle_id) + " has entered service.")
 
 class AssignRoute(Event):
     """
     Assign a route to the current vehicle.
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
 
@@ -74,11 +75,11 @@ class AssignRoute(Event):
         vehicle.state = State.HEADING_TO_ROUTE_START
         # Print information to the console
         print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " has been assigned route " + route.route_id + ".")
-        print("Vehicle #" + vehicle.vehicle_id + " is now " + vehicle.state.__str__())
+        print("Vehicle #" + str(vehicle.vehicle_id) + " has been assigned route " + route.route_id + ".")
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
 
         # Check to see if the vehicle is already at the first stop
-        if vehicle.current_stop() == vehicle.route.get_stop(self,0):
+        if vehicle.current_stop() == vehicle.route.get_stop(0):
             # Vehicle is already at first stop
             simulator.schedule_event(
                 ArriveAtStop(current_time, vehicle)
@@ -93,7 +94,7 @@ class DeassignRoute(Event):
     """
     Remove the current vehicle from the route.
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
 
@@ -103,9 +104,9 @@ class DeassignRoute(Event):
         vehicle.state = State.IDLE
         # Print information to the console
         print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " has been removed from route " + vehicle.route.route_id + ".")
-        print("Vehicle #" + vehicle.vehicle_id + " is now " + vehicle.state.__str__())
-        vehicle.route.deassign()
+        print("Vehicle #" + str(vehicle.vehicle_id) + " has been removed from route " + str(vehicle.route.route_id) + ".")
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
+        vehicle.deassign()
 
         # Check to see if there are more routes assigned
         if simulator.has_next_route():
@@ -123,7 +124,7 @@ class ArriveAtStop(Event):
     Arrive at a stop.
     """
 
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
 
@@ -134,8 +135,8 @@ class ArriveAtStop(Event):
         vehicle.state = State.AT_STOP
         # Print information to the console
         print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " arrived at stop " + vehicle.current_stop().name + ".")
-        print("Vehicle #" + vehicle.vehicle_id + " is now " + vehicle.state.__str__())
+        print("Vehicle #" + str(vehicle.vehicle_id) + " arrived at stop " + vehicle.current_stop().name + ".")
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
         # Begin dwelling at stop
         simulator.schedule_event(
             DwellAtStop(current_time, vehicle)
@@ -145,7 +146,7 @@ class DwellAtStop(Event):
     """
     Wait at a stop while passengers load and unload.
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
         self.per_passenger_time = 0.5
@@ -175,14 +176,14 @@ class DwellAtStop(Event):
 
         # Print information to the console
         print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " is at stop " + vehicle.current_stop().name + ".")
-        print("Vehicle #" + vehicle.vehicle_id + " is now " + vehicle.state.__str__())
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is at stop " + vehicle.current_stop().name + ".")
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
 
         # Schedule Departure
         if vehicle.has_next_stop():
             departure_time = current_time + adjusted_dwell
             simulator.schedule_event(
-                DepartStop(departure_time, vehicle)
+                DepartStop(int(departure_time), vehicle)
             )
         else:
             simulator.schedule_event(FinalDwellComplete(current_time, vehicle))
@@ -191,7 +192,7 @@ class DepartStop(Event):
     """
     Depart a stop and begin traveling.
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
         self.CHANCE_OF_TRAFFIC = 10
@@ -213,8 +214,8 @@ class DepartStop(Event):
 
         # Print information to the console
         print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " departed stop " + vehicle.current_stop().name + ".")
-        print("Vehicle #" + vehicle.vehicle_id + " is now " + vehicle.state.__str__())
+        print("Vehicle #" + str(vehicle.vehicle_id) + " departed stop " + vehicle.current_stop().name + ".")
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
 
         # Get travel time to:
              # Route Start
@@ -248,7 +249,7 @@ class FinalDwellComplete(Event):
     """
     Executes after final stop dwell completes.
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
 
@@ -261,9 +262,9 @@ class FinalDwellComplete(Event):
         vehicle.state = State.ROUTE_COMPLETE
         # Print information to the console
         print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " is at stop " + vehicle.current_stop().name + ".")
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is at stop " + vehicle.current_stop().name + ".")
         print("This was the final stop on this vehicles current route.")
-        print("Vehicle #" + vehicle.vehicle_id + " is now " + vehicle.state.__str__())
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
         # TODO add possibility of route repeats,
         #  ie perform the same route 3 times in a row
         #  would schedule RestartRoute event
@@ -275,7 +276,7 @@ class RestartRoute(Event):
     """
     Begin the same route again, from the first stop.
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
 
@@ -288,7 +289,7 @@ class EndService(Event):
     Vehicle exits service when no further routes
     are available.
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
 
@@ -299,7 +300,7 @@ class EndService(Event):
         vehicle.state = State.OUT_OF_SERVICE
         # Print information to the console
         print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " is now " + vehicle.state.__str__())
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
 
 
 # ======================== #
@@ -309,7 +310,7 @@ class TrafficDelay(Event):
     """
     Delay transit from one stop to another.
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
 
@@ -320,7 +321,7 @@ class TrafficDelay(Event):
 
         # Print information to the console
         print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " is now " + vehicle.state.__str__())
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
 
         # Calculate length of delay
         delay_time = random.randrange(1,5)
@@ -334,7 +335,7 @@ class Breakdown(Event):
     Mechanical problem with the vehicle.
     Determine if repair is possible.
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
         self.repair_chance = 80
@@ -347,7 +348,7 @@ class Breakdown(Event):
 
         # Print information to the console
         print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " is experiencing a " + vehicle.state.__str__())
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is experiencing a " + vehicle.state.__str__())
         if self.repairable:
             # Vehicle cannot be repaired
             print("Vehicle cannot be repaired.")
@@ -361,7 +362,7 @@ class RepairInProgress(Event):
     """
     Repairs are possible, add delay time.
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
 
@@ -371,7 +372,7 @@ class RepairInProgress(Event):
         vehicle.state = State.DELAYED
         # Print information to the console
         print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " is being repaired.")
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is being repaired.")
 
         # Calculate length of delay
         delay_time = random.randrange(10,30)
@@ -383,7 +384,7 @@ class DelayComplete(Event):
     """
     Delay is complete and vehicle can continue to next stop.
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
 
@@ -393,7 +394,7 @@ class DelayComplete(Event):
         vehicle.state = State.IN_TRANSIT
         # Print information to the console
         print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " has completed its delay.")
+        print("Vehicle #" + str(vehicle.vehicle_id) + " has completed its delay.")
         # Schedule next event
         simulator.schedule_event(ArriveAtStop(current_time, vehicle))
 
@@ -403,7 +404,7 @@ class CannotRepair(Event):
     and cannot be repaired.
     This ends the route prematurely.
     """
-    def __init__(self, time: int, vehicle):
+    def __init__(self, time: int, vehicle: Vehicle):
         super().__init__(time)
         self.vehicle = vehicle
 
@@ -414,4 +415,4 @@ class CannotRepair(Event):
         vehicle.state = State.OUT_OF_SERVICE
         # Print information to the console
         print(current_time)
-        print("Vehicle #" + vehicle.vehicle_id + " is now " + vehicle.state.__str__())
+        print("Vehicle #" + str(vehicle.vehicle_id) + " is now " + vehicle.state.__str__())
