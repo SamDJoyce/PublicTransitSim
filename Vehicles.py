@@ -59,6 +59,9 @@ class Vehicle(ABC):
             raise ValueError("Vehicle has no assigned route.")
         return self.route.is_last_stop(self.current_stop_index)
 
+    def total_service_time(self) -> int:
+        return self.service_end_time - self.service_start_time
+
     #   ====================
     # || Passenger Handling ||
     #   ====================

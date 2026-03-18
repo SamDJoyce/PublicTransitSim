@@ -3,16 +3,23 @@ from typing import List
 
 from Events import Event
 from Passengers import Passenger
+from Routes import Route
+from Vehicles import Vehicle
 
 
 class Simulator:
-    def __init__(self, vehicles, routes):
-        self.vehicles     = vehicles
-        self.route_queue  = routes
+    """
+    Runs the simulation by managing events and tracking time.
+    Also collects logs and metrics from each simulation.
+    """
+    def __init__(self):
+        self.vehicles     = {}
+        self.route_queue  = []
         self.current_time = 0
         self.event_queue  = []
         self.completed_passengers: List[Passenger] = []
         self.log = []
+
 
     def get_next_route(self):
         if self.has_next_route():
@@ -37,7 +44,9 @@ class Simulator:
         print(log_entry)
 
     def run(self):
+        self.log_event("Starting simulation.")
         while self.event_queue:
             event = heapq.heappop(self.event_queue)
             self.current_time = event.time
             event.process(self)
+        self.log_event("Simulation complete.")

@@ -60,7 +60,9 @@ class Passenger:
         return self.embark_time - self.arrival_time
 
     def travel_time(self) -> Optional[int]:
-        """Time spent onboard vehicle."""
+        """
+        Time spent onboard a vehicle.
+        """
         if self.embark_time is None or self.disembark_time is None:
             return None
         return self.disembark_time - self.embark_time
@@ -68,6 +70,7 @@ class Passenger:
     def total_trip_time(self) -> Optional[int]:
         """
         Total time from arrival at origin to destination.
+        This includes wait time at the stop.
         """
         if self.disembark_time is None:
             return None

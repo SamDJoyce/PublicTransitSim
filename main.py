@@ -3,11 +3,15 @@ import sys
 
 import Events
 from Loader import Loader
+from Metrics import Metrics
+from SimulationLog import SimulationLog
 from Simulator import Simulator
 
 
 class MainMenu:
-    def __init__(self):
+    def __init__(self, sim: Simulator, metrics: Metrics):
+        self.sim = sim
+        self.metrics = metrics
         self.choice = None
         self.config_loaded = False
         self.simulation_run = False
@@ -32,7 +36,8 @@ class MainMenu:
         print("-" * 30)
         print("1. Load Configuration File")
         print("2. Run Simulation")
-        print("3. Exit")
+        print("3. View Simulation Logs")
+        print("4. Exit")
         print("-" * 30)
 
 
@@ -58,13 +63,36 @@ class MainMenu:
         """
         Run the simulation.
         """
-        vehicles = self.config.vehicles
-        routes = self.config.routes
-        sim = Simulator(vehicles, routes)
-        for vehicle in sim.vehicles.values():
-            sim.schedule_event(Events.StartService(0,vehicle))
-        sim.run()
+        if self.config.vehicles is not None:
+            self.sim.vehicles = self.config.vehicles
+        else:
+            raise TypeError("Vehicles not loaded.")
+        if self.config.routes is not None:
+            self.sim.route_queue = self.config.routes
+        else:
+            raise TypeError("Routes not loaded.")
+        for vehicle in self.sim.vehicles.values():
+            self.sim.schedule_event(Events.StartService(0,vehicle))
+        self.sim.run()
+        self.metrics.save_log(SimulationLog(
+            self.sim.log, self.sim.vehicles, self.sim.completed_passengers
+        ))
 
+    def view_logs(self):
+        self.clear_screen()
+        i = 0
+        # Print a list of saved logs
+        for log in self.metrics.saved_logs:
+            i += 1
+            print(f"Log[{i}]")
+        # Print the selected log
+        while True:
+            self.choice = input(f"\nSelect a log to view (1-{i})").strip()
+            if self.choice.isdigit() and 0 < int(self.choice) <= i:
+                self.metrics.print_all(i)
+                break
+            else:
+                print("\nInvalid selection. Please choose a valid option.")
 
     def choose(self):
         self.choice = input("Select an option (1-3): ").strip()
@@ -81,6 +109,13 @@ class MainMenu:
                 self.run_simulation()
                 self.pause()
         elif self.choice == "3":
+            if self.metrics is None or len(self.metrics.saved_logs) == 0:
+                print("\nError: No saved logs to display.")
+                self.pause()
+            else:
+                self.view_logs()
+                self.pause()
+        elif self.choice == "4":
             print("\nExiting system. Goodbye.")
             sys.exit()
         else:
@@ -88,7 +123,9 @@ class MainMenu:
             self.pause()
 
 def main():
-    menu = MainMenu()
+    sim = Simulator()
+    metrics = Metrics()
+    menu = MainMenu(sim, metrics)
     # Menu Loop
     while True:
         menu.clear_screen()
