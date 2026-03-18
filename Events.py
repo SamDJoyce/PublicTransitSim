@@ -47,9 +47,10 @@ class StartService(Event):
         vehicle.service_start_time = current_time
         vehicle.state = State.IDLE
         simulator.schedule_event(AssignRoute(current_time, vehicle))
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " has is now IN SERVICE.")
+        # Log the event
+        simulator.log_event(
+            f"Vehicle #{vehicle.vehicle_id} is now IN SERVICE and IDLE"
+        )
 
 class AssignRoute(Event):
     """
@@ -73,9 +74,10 @@ class AssignRoute(Event):
             raise RuntimeError("No routes remaining in queue.")
         vehicle.route = route
         vehicle.state = State.HEADING_TO_ROUTE_START
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " has been ASSIGNED ROUTE " + str(route.route_id) + ".")
+        # Log the event
+        simulator.log_event(
+            f"Vehicle #{vehicle.vehicle_id} has been ASSIGNED route {vehicle.route.route_id}."
+        )
 
         # Check to see if the vehicle is already at the first stop
         if vehicle.current_stop() == vehicle.route.get_stop(0):
@@ -101,10 +103,11 @@ class DeassignRoute(Event):
         current_time = self.time
         vehicle = self.vehicle
         vehicle.state = State.IDLE
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " has been removed from route " + str(vehicle.route.route_id) + ".")
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now IDLE.")
+        # Log the event
+        simulator.log_event(
+            f"Vehicle #{vehicle.vehicle_id} has been REMOVED from route {vehicle.route.route_id} and is now IDLE."
+        )
+
         vehicle.deassign()
 
         # Check to see if there are more routes assigned
@@ -132,9 +135,10 @@ class ArriveAtStop(Event):
         vehicle = self.vehicle
         # Set vehicle state
         vehicle.state = State.AT_STOP
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " arrived AT STOP " + vehicle.current_stop().name + ".")
+        # Log the event
+        simulator.log_event(
+            f"Vehicle #{vehicle.vehicle_id} has ARRIVED AT STOP {vehicle.current_stop().name}."
+        )
         # Begin dwelling at stop
         simulator.schedule_event(
             DwellAtStop(current_time, vehicle)
@@ -155,17 +159,18 @@ class DwellAtStop(Event):
         stop = vehicle.current_stop()
         # Set state
         self.vehicle.state = State.DWELL
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is DWELLING at stop " + vehicle.current_stop().name + ".")
+        # Log the event
+        simulator.log_event(
+            f"Vehicle #{vehicle.vehicle_id} is DWELLING at stop {vehicle.current_stop().name}."
+        )
 
         # Disembark Passengers
-        completed = vehicle.disembark_passengers(current_time)
+        completed = vehicle.disembark_passengers(simulator)
         simulator.completed_passengers.extend(completed)
 
         # Embark Passengers
         waiting_queue = stop.get_waiting_passengers()
-        remaining_queue = vehicle.embark_passengers(waiting_queue, current_time)
+        remaining_queue = vehicle.embark_passengers(waiting_queue, simulator)
         # Excess passengers remain at the stop
         stop.set_queue(remaining_queue)
 
@@ -193,6 +198,7 @@ class DepartStop(Event):
         self.vehicle = vehicle
         self.CHANCE_OF_TRAFFIC = 10
         self.CHANCE_OF_BREAKDOWN = 1
+        # Determine if there will be a delay before departing
         self.traffic = random.randrange(1,100) <= self.CHANCE_OF_TRAFFIC
         self.breakdown = random.randrange(1,100) <= self.CHANCE_OF_BREAKDOWN
 
@@ -206,9 +212,10 @@ class DepartStop(Event):
         # Set State
         vehicle.state = State.IN_TRANSIT
 
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " DEPARTED STOP " + vehicle.current_stop().name + ".")
+        # Log the event
+        simulator.log_event(
+            f"Vehicle #{vehicle.vehicle_id} has DEPARTED STOP {vehicle.current_stop().name}."
+        )
 
         # Get travel time to:
              # Route Start
@@ -253,10 +260,10 @@ class FinalDwellComplete(Event):
         if not vehicle.at_last_stop():
             raise RuntimeError("FinalDwellComplete triggered when not at last stop.")
         vehicle.state = State.ROUTE_COMPLETE
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("This was the FINAL STOP on this vehicles current route.")
-        print("Vehicle #" + str(vehicle.vehicle_id) + " has COMPLETED route " + str(vehicle.route.route_id))
+        # Log the event
+        simulator.log_event(
+            f"Vehicle #{vehicle.vehicle_id} has been COMPLETED its current route, {vehicle.route.route_id}."
+        )
         # TODO add possibility of route repeats,
         #  ie perform the same route 3 times in a row
         #  would schedule RestartRoute event
@@ -290,9 +297,10 @@ class EndService(Event):
         current_time = self.time
         vehicle.service_end_time = current_time
         vehicle.state = State.OUT_OF_SERVICE
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now OUT OF SERVICE.")
+        # Log the event
+        simulator.log_event(
+            f"Vehicle #{vehicle.vehicle_id} is now OUT OF SERVICE."
+        )
 
 
 # ======================== #
@@ -311,9 +319,10 @@ class TrafficDelay(Event):
         current_time = self.time
         vehicle.state = State.DELAYED
 
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now DELAYED")
+        # Log the event
+        simulator.log_event(
+            f"Vehicle #{vehicle.vehicle_id} has been DELAYED."
+        )
 
         # Calculate length of delay
         delay_time = random.randrange(1,5)
@@ -338,16 +347,18 @@ class Breakdown(Event):
         current_time = self.time
         vehicle.state = State.BREAKDOWN
 
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is experiencing a BREAKDOWN.")
+        # Log the event
+        simulator.log_event(
+            f"Vehicle #{vehicle.vehicle_id} is experiencing a BREAKDOWN."
+        )
+
         if self.repairable:
             # Vehicle cannot be repaired
-            print("Vehicle cannot be repaired.")
+            simulator.log_event("Vehicle CANNOT be repaired.")
             simulator.schedule_event(CannotRepair(current_time, vehicle))
         else:
             # Vehicle can be repaired
-            print("Vehicle can be repaired")
+            simulator.log_event("Vehicle CAN be repaired.")
             simulator.schedule_event(RepairInProgress(current_time, vehicle))
 
 class RepairInProgress(Event):
@@ -362,9 +373,10 @@ class RepairInProgress(Event):
         vehicle = self.vehicle
         current_time = self.time
         vehicle.state = State.DELAYED
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is BEING REPAIRED.")
+        # Log the event
+        simulator.log_event(
+            f"Vehicle #{vehicle.vehicle_id} is BEING REPAIRED."
+        )
 
         # Calculate length of delay
         delay_time = random.randrange(10,30)
@@ -384,9 +396,10 @@ class DelayComplete(Event):
         vehicle = self.vehicle
         current_time = self.time
         vehicle.state = State.IN_TRANSIT
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " has COMPLETED its DELAY.")
+        # Log the event
+        simulator.log_event(
+            f"DELAY COMPLETE for Vehicle #{vehicle.vehicle_id}."
+        )
         # Schedule next event
         simulator.schedule_event(ArriveAtStop(current_time, vehicle))
 
@@ -405,6 +418,7 @@ class CannotRepair(Event):
         current_time = self.time
         vehicle.service_end_time = current_time
         vehicle.state = State.OUT_OF_SERVICE
-        # Print information to the console
-        print("\nTime = " + str(current_time))
-        print("Vehicle #" + str(vehicle.vehicle_id) + " is now OUT OF SERVICE.")
+        # Log the event
+        simulator.log_event(
+            f"Vehicle #{vehicle.vehicle_id} is now OUT OF SERVICE."
+        )

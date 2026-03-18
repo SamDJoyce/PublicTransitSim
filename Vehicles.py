@@ -66,11 +66,12 @@ class Vehicle(ABC):
     def has_space(self) -> bool:
         return (self.capacity() - self.current_passenger_count) > 0
 
-    def embark_passengers(self, queue: List[Passenger], current_time) -> List[Passenger]:
+    def embark_passengers(self, queue: List[Passenger], simulator) -> List[Passenger]:
         """
         Boards passengers up to vehicle capacity.
         Returns the remaining passengers if any.
         """
+        current_time = simulator.current_time
         remaining: List[Passenger] = []
         for passenger in queue:
             if self.has_space():
@@ -78,25 +79,34 @@ class Vehicle(ABC):
                 self.embarked_passengers.append(passenger)
                 self.current_passenger_count += 1
                 self.total_passengers_carried += 1
-                print("Passenger " + str(passenger.passenger_id) + " has boarded vehicle " + str(self.vehicle_id) + ".")
+                # Log the event
+                simulator.log_event(
+                    f"Passenger #{passenger.passenger_id} has boarded vehicle {self.vehicle_id}."
+                )
             else:
                 remaining.append(passenger)
         if len(remaining) > 0:
-            print(str(len(remaining)) + " passengers could not board.")
+            simulator.log_event(
+                f"Vehicle {self.vehicle_id} is full. {len(remaining)} passengers could not board."
+            )
         return remaining
 
-    def disembark_passengers(self, current_time: int) -> List[Passenger]:
+    def disembark_passengers(self, simulator) -> List[Passenger]:
         """
         Removes passengers from the vehicle
         Returns a list of Passengers who have completed their trip
         """
+        current_time = simulator.current_time
         remaining: List[Passenger] = []
         disembarking:List[Passenger] = []
         for passenger in self.embarked_passengers:
             if passenger.at_destination(self.current_stop()):
                 passenger.disembark(current_time)
                 disembarking.append(passenger)
-                print("Passenger " + str(passenger.passenger_id) + " has has reached their destination " + self.current_stop().name + ".")
+                # Log the event
+                simulator.log_event(
+                    f"Passenger #{passenger.passenger_id} has reached their destination: {self.current_stop().name}."
+                )
             else:
                 remaining.append(passenger)
         self.embarked_passengers = remaining

@@ -12,6 +12,7 @@ class Simulator:
         self.current_time = 0
         self.event_queue  = []
         self.completed_passengers: List[Passenger] = []
+        self.log = []
 
     def get_next_route(self):
         if self.has_next_route():
@@ -29,6 +30,11 @@ class Simulator:
 
     def schedule_event(self, event: Event):
         heapq.heappush(self.event_queue, event)
+
+    def log_event(self, message: str):
+        log_entry = f"[Time={self.current_time:.2f}] {message}"
+        self.log.append(log_entry)
+        print(log_entry)
 
     def run(self):
         while self.event_queue:

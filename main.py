@@ -40,6 +40,10 @@ class MainMenu:
         input("\nPress Enter to return to the main menu...")
 
     def load_config(self):
+        """
+        Load the configuration file.
+        :return: true if the configuration file was successfully loaded.
+        """
         file_path = input("Enter YAML configuration file path: ").strip()
         print(f"\nLoading configuration from '{file_path}'...")
         self.config = Loader(file_path)
@@ -51,6 +55,9 @@ class MainMenu:
             return True
 
     def run_simulation(self):
+        """
+        Run the simulation.
+        """
         vehicles = self.config.vehicles
         routes = self.config.routes
         sim = Simulator(vehicles, routes)
