@@ -15,7 +15,7 @@ class Simulator:
     def __init__(self):
         self.vehicles     = {}
         self.route_queue  = []
-        self.current_time = 0
+        self.current_time: float = 0.0
         self.event_queue  = []
         self.completed_passengers: List[Passenger] = []
         self.log = []
@@ -33,7 +33,7 @@ class Simulator:
     def get_time_to_next_route(self):
         # TODO This should be dynamic
         #  current value is a placeholder
-        return 10
+        return 10.0
 
     def schedule_event(self, event: Event):
         heapq.heappush(self.event_queue, event)
@@ -43,7 +43,13 @@ class Simulator:
         self.log.append(log_entry)
         print(log_entry)
 
+    def clear_logs(self):
+        self.completed_passengers = []
+        self.log = []
+        self.current_time = 0.0
+
     def run(self):
+        self.clear_logs()
         self.log_event("Starting simulation.")
         while self.event_queue:
             event = heapq.heappop(self.event_queue)

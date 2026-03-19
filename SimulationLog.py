@@ -16,19 +16,19 @@ class SimulationLog:
         return len(self.completed_passengers)
 
     def avg_travel_time(self):
-        total_time = 0
+        total_time = 0.0
         for passenger in self.completed_passengers:
             total_time += passenger.travel_time()
         return total_time / self.num_completed_trips()
 
     def avg_trip_time(self):
-        total_time = 0
+        total_time = 0.0
         for passenger in self.completed_passengers:
             total_time += passenger.total_trip_time()
         return total_time / self.num_completed_trips()
 
     def avg_wait_time(self):
-        total_time = 0
+        total_time = 0.0
         for passenger in self.completed_passengers:
             total_time += passenger.wait_time()
         return total_time / self.num_completed_trips()
@@ -40,9 +40,9 @@ class SimulationLog:
         return len(self.vehicles)
 
     def avg_service_time(self):
-        total_time = 0
+        total_time = 0.0
         for vehicle in self.vehicles.values():
-            total_time += vehicle.service_time()
+            total_time += vehicle.total_service_time()
         return total_time / self.num_vehicles()
 
     def avg_passengers_carried(self):
@@ -51,5 +51,5 @@ class SimulationLog:
     def total_passengers_carried(self):
         total_passengers = 0
         for vehicle in self.vehicles.values():
-            total_passengers += vehicle.total_passengers_carried()
+            total_passengers += vehicle.total_passengers_carried
         return total_passengers

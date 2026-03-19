@@ -20,7 +20,7 @@ class Passenger:
             passenger_id: int,
             origin_stop: "Stop",
             destination_stop: "Stop",
-            arrival_time: int
+            arrival_time: float
     ):
         if origin_stop == destination_stop:
             raise Exception('origin_stop and destination_stop cannot be the same')
@@ -29,19 +29,19 @@ class Passenger:
         self.origin_stop = origin_stop
         self.destination_stop = destination_stop
         self.arrival_time = arrival_time
-        self.embark_time: Optional[int] = None
-        self.disembark_time: Optional[int] = None
+        self.embark_time: Optional[float] = None
+        self.disembark_time: Optional[float] = None
 
     #   ===============
     # || State Updates ||
     #   ===============
 
-    def embark(self, time: int):
+    def embark(self, time: float):
         if self.embark_time is not None:
             raise ValueError("Passenger has already embarked.")
         self.embark_time = time
 
-    def disembark(self, time: int):
+    def disembark(self, time: float):
         if self.embark_time is None:
             raise ValueError("Passenger cannot disembark before embarking.")
         if self.disembark_time is not None:
@@ -51,7 +51,7 @@ class Passenger:
     #   =========
     # || Metrics ||
     #   =========
-    def wait_time(self) -> Optional[int]:
+    def wait_time(self) -> Optional[float]:
         """
         Time waited at stop before boarding.
         """
@@ -59,7 +59,7 @@ class Passenger:
             return None
         return self.embark_time - self.arrival_time
 
-    def travel_time(self) -> Optional[int]:
+    def travel_time(self) -> Optional[float]:
         """
         Time spent onboard a vehicle.
         """
@@ -67,7 +67,7 @@ class Passenger:
             return None
         return self.disembark_time - self.embark_time
 
-    def total_trip_time(self) -> Optional[int]:
+    def total_trip_time(self) -> Optional[float]:
         """
         Total time from arrival at origin to destination.
         This includes wait time at the stop.

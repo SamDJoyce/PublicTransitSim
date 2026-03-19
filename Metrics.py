@@ -28,15 +28,15 @@ class Metrics:
         for vehicle in log.vehicles.values():
             print(f"\nVehicle: {vehicle.vehicle_id}")
             print(f"Began Service: {vehicle.service_start_time}")
-            print(f"Ended Service: {vehicle.service_end_time}")
+            print(f"Ended Service: {vehicle.service_end_time:.2f}")
             print(f"Total travel time: {vehicle.total_travel_time}")
-            print(f"Total service time: {vehicle.total_service_time()}")
-            print(f"Total carried passengers: {vehicle.total_carried_passengers}")
+            print(f"Total service time: {vehicle.total_service_time():.2f}")
+            print(f"Total carried passengers: {vehicle.total_passengers_carried}")
         print("-" * 30)
         print(f"\nCumulative Vehicle Data")
         print(f"Total number of vehicles: {log.num_vehicles()}")
         print(f"Total passengers carried by all vehicles: {log.total_passengers_carried()}")
-        print(f"Average service time per vehicle: {log.avg_service_time()}")
+        print(f"Average service time per vehicle: {log.avg_service_time():.2f}")
         print(f"Average passengers carried per vehicle: {log.total_passengers_carried()}")
 
     def print_passenger_data(self, index: int):

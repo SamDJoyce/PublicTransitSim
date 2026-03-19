@@ -1,6 +1,5 @@
 import random
 from abc import ABC, abstractmethod
-from typing import Any
 
 from VehicleStates import State
 from Vehicles import Vehicle
@@ -14,10 +13,11 @@ class Event(ABC):
     Base class for all simulation events.
     Events are ordered by scheduled time.
     """
-    def __init__(self, time: int):
+    def __init__(self, time: float, vehicle: Vehicle):
         if time < 0:
             raise ValueError("Time cannot be negative.")
         self.time = time
+        self.vehicle = vehicle
 
     @abstractmethod
     def process(self, simulator):
@@ -37,9 +37,8 @@ class StartService(Event):
     """
     Begin vehicle lifecycle
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
 
     def process(self, simulator):
         vehicle = self.vehicle
@@ -56,9 +55,8 @@ class AssignRoute(Event):
     """
     Assign a route to the current vehicle.
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
 
     def process(self, simulator):
         current_time = self.time
@@ -95,9 +93,8 @@ class DeassignRoute(Event):
     """
     Remove the current vehicle from the route.
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
 
     def process(self, simulator):
         current_time = self.time
@@ -126,9 +123,8 @@ class ArriveAtStop(Event):
     Arrive at a stop.
     """
 
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
 
     def process(self, simulator):
         current_time = self.time
@@ -148,10 +144,9 @@ class DwellAtStop(Event):
     """
     Wait at a stop while passengers load and unload.
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
-        self.per_passenger_time = 0.5
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
+        self.per_passenger_time = 0.1
 
     def process(self, simulator):
         current_time = self.time
@@ -184,7 +179,7 @@ class DwellAtStop(Event):
         if vehicle.has_next_stop():
             departure_time = current_time + adjusted_dwell
             simulator.schedule_event(
-                DepartStop(int(departure_time), vehicle)
+                DepartStop(departure_time, vehicle)
             )
         else:
             simulator.schedule_event(FinalDwellComplete(current_time, vehicle))
@@ -193,13 +188,12 @@ class DepartStop(Event):
     """
     Depart a stop and begin traveling.
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
-        self.CHANCE_OF_TRAFFIC = 10
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
+        self.CHANCE_OF_TRAFFIC   = 10
         self.CHANCE_OF_BREAKDOWN = 1
         # Determine if there will be a delay before departing
-        self.traffic = random.randrange(1,100) <= self.CHANCE_OF_TRAFFIC
+        self.traffic   = random.randrange(1,100) <= self.CHANCE_OF_TRAFFIC
         self.breakdown = random.randrange(1,100) <= self.CHANCE_OF_BREAKDOWN
 
     def process(self, simulator):
@@ -238,7 +232,7 @@ class DepartStop(Event):
                 ArriveAtStop(arrival_time, vehicle)
             )
 
-    def calculate_travel_time(self, base_travel_time, current_time: int, vehicle) -> int | Any:
+    def calculate_travel_time(self, base_travel_time, current_time: float, vehicle) -> float:
         adjusted_travel_time = base_travel_time * vehicle.speed()
         vehicle.total_travel_time += adjusted_travel_time
         arrival_time = current_time + adjusted_travel_time
@@ -249,9 +243,8 @@ class FinalDwellComplete(Event):
     """
     Executes after final stop dwell completes.
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
 
     def process(self, simulator):
         current_time = self.time
@@ -275,9 +268,8 @@ class RestartRoute(Event):
     """
     Begin the same route again, from the first stop.
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
 
     def process(self, simulator):
         pass #TODO
@@ -288,9 +280,8 @@ class EndService(Event):
     Vehicle exits service when no further routes
     are available.
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
 
     def process(self, simulator):
         vehicle = self.vehicle
@@ -310,9 +301,8 @@ class TrafficDelay(Event):
     """
     Delay transit from one stop to another.
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
 
     def process(self, simulator):
         vehicle = self.vehicle
@@ -336,9 +326,8 @@ class Breakdown(Event):
     Mechanical problem with the vehicle.
     Determine if repair is possible.
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
         self.repair_chance = 80
         self.repairable = random.randrange(1, 100) <= self.repair_chance
 
@@ -365,9 +354,8 @@ class RepairInProgress(Event):
     """
     Repairs are possible, add delay time.
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
 
     def process(self, simulator):
         vehicle = self.vehicle
@@ -388,9 +376,8 @@ class DelayComplete(Event):
     """
     Delay is complete and vehicle can continue to next stop.
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
 
     def process(self, simulator):
         vehicle = self.vehicle
@@ -409,9 +396,8 @@ class CannotRepair(Event):
     and cannot be repaired.
     This ends the route prematurely.
     """
-    def __init__(self, time: int, vehicle: Vehicle):
-        super().__init__(time)
-        self.vehicle = vehicle
+    def __init__(self, time: float, vehicle: Vehicle):
+        super().__init__(time, vehicle)
 
     def process(self, simulator):
         vehicle = self.vehicle

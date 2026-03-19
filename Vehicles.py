@@ -21,16 +21,16 @@ class Vehicle(ABC):
         self.embarked_passengers: Optional[List[Passenger]] = []
         self.current_passenger_count: int = 0
         self.total_passengers_carried = 0
-        self.total_travel_time = 0
-        self.service_start_time = 0
-        self.service_end_time = 0
+        self.total_travel_time: float = 0.0
+        self.service_start_time: float = 0.0
+        self.service_end_time: float = 0.0
         self.state = State.INIT
 
     #   =================
     # || Abstract Methods ||
     #   =================
     @abstractmethod
-    def dwell_time(self) -> int: pass
+    def dwell_time(self) -> float: pass
         # Time spent at a stop before departure
 
     @abstractmethod
@@ -59,7 +59,7 @@ class Vehicle(ABC):
             raise ValueError("Vehicle has no assigned route.")
         return self.route.is_last_stop(self.current_stop_index)
 
-    def total_service_time(self) -> int:
+    def total_service_time(self) -> float:
         return self.service_end_time - self.service_start_time
 
     #   ====================
@@ -129,11 +129,11 @@ class Vehicle(ABC):
 class Bus(Vehicle):
     def __init__(self, vehicle_id: str, route: Optional[Route] = None, ):
         super().__init__(vehicle_id, route)
-        self._dwell_time = 1
+        self._dwell_time = 1.0
         self._speed      = 1.0
         self._capacity   = 60
 
-    def dwell_time(self) -> int:
+    def dwell_time(self) -> float:
         return self._dwell_time
 
     def speed(self) -> float:

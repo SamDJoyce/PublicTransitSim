@@ -28,7 +28,6 @@ class MainMenu:
         print("=" * 60)
         print("PUBLIC TRANSIT DISCRETE-EVENT SIMULATION SYSTEM".center(60))
         print("=" * 60)
-        print("-" * 60)
 
 
     def print_main_menu(self):
@@ -95,7 +94,7 @@ class MainMenu:
                 print("\nInvalid selection. Please choose a valid option.")
 
     def choose(self):
-        self.choice = input("Select an option (1-3): ").strip()
+        self.choice = input("Select an option (1-4): ").strip()
         # Load config file
         if self.choice == "1":
             self.config_loaded = self.load_config()
