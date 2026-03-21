@@ -1,11 +1,13 @@
 import copy
+from datetime import datetime
 from typing import List
 
 from Passengers import Passenger
 
 class SimulationLog:
     def __init__(self, log, vehicles, passengers):
-        self.log = copy.deepcopy(log)
+        self.timestamp = datetime.now()
+        self.event_log = copy.deepcopy(log)
         self.vehicles = copy.deepcopy(vehicles)
         self.completed_passengers: List[Passenger] = copy.deepcopy(passengers)
 
@@ -53,3 +55,9 @@ class SimulationLog:
         for vehicle in self.vehicles.values():
             total_passengers += vehicle.total_passengers_carried
         return total_passengers
+
+    # ==================== #
+    # ===== Helpers ====== #
+    # ==================== #
+    def timestamp_string(self):
+        return self.timestamp.strftime("%Y-%m-%d_%H-%M")

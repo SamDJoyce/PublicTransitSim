@@ -1,8 +1,9 @@
+import copy
 from abc import ABC, abstractmethod
 from typing import Optional, List
 
 from Passengers import Passenger
-from Routes import Route, Stop
+from Routes import Route
 from VehicleStates import State
 
 
@@ -16,6 +17,7 @@ class Vehicle(ABC):
     def __init__(self, vehicle_id: str, route: Optional[Route] = None, ):
         self.vehicle_id = vehicle_id
         self.route = route
+        self.completed_routes: List[Route] = []
 
         self.current_stop_index = 0
         self.embarked_passengers: Optional[List[Passenger]] = []
@@ -119,6 +121,7 @@ class Vehicle(ABC):
         self.current_stop_index = 0
 
     def deassign(self):
+        self.completed_routes.append(copy.deepcopy(self.route))
         self.route = None
         self.current_stop_index = 0
 

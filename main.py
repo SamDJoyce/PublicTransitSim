@@ -4,6 +4,7 @@ import sys
 import Events
 from Loader import Loader
 from Metrics import Metrics
+from SaveFile import SaveFile
 from SimulationLog import SimulationLog
 from Simulator import Simulator
 
@@ -16,6 +17,13 @@ class MainMenu:
         self.config_loaded = False
         self.simulation_run = False
         self.config = None
+        self.menu_items = [
+            "Load Configuration File",
+            "Run Simulation",
+            "View Simulation Logs",
+            "Export Simulation Logs",
+            "Exit"
+        ]
 
     def clear_screen(self):
         """
@@ -33,12 +41,11 @@ class MainMenu:
     def print_main_menu(self):
         print("\nMain Menu")
         print("-" * 30)
-        print("1. Load Configuration File")
-        print("2. Run Simulation")
-        print("3. View Simulation Logs")
-        print("4. Exit")
+        i = 0
+        while i < len(self.menu_items):
+            print(f"{i+1}. {self.menu_items[i]}")
+            i += 1
         print("-" * 30)
-
 
     def pause(self):
         input("\nPress Enter to return to the main menu...")
@@ -77,24 +84,42 @@ class MainMenu:
             self.sim.log, self.sim.vehicles, self.sim.completed_passengers
         ))
 
-    def view_logs(self):
-        self.clear_screen()
+    def _print_logs(self):
         i = 0
         # Print a list of saved logs
         for log in self.metrics.saved_logs:
             i += 1
-            print(f"Log[{i}]")
+            print(f"Log[{i}] - {log.timestamp_string()}")
+        return i
+
+    def view_logs(self):
+        self.clear_screen()
+        i = self._print_logs()
         # Print the selected log
         while True:
             self.choice = input(f"\nSelect a log to view (1-{i})").strip()
             if self.choice.isdigit() and 0 < int(self.choice) <= i:
-                self.metrics.print_all(i)
+                self.metrics.print_all(i-1)
+                break
+            else:
+                print("\nInvalid selection. Please choose a valid option.")
+
+    def export_logs(self):
+        self.clear_screen()
+        i = self._print_logs()
+        while True:
+            self.choice = input(f"\nSelect a log to export (1-{i})").strip()
+            choice = int(self.choice)
+            if self.choice.isdigit() and 0 < int(choice) <= i:
+                save = SaveFile(self.metrics.saved_logs[choice-1])
+                save.save_log_to_disk()
+                print("\nSuccessfully saved log to disk.")
                 break
             else:
                 print("\nInvalid selection. Please choose a valid option.")
 
     def choose(self):
-        self.choice = input("Select an option (1-4): ").strip()
+        self.choice = input("Select an option (1-5): ").strip()
         # Load config file
         if self.choice == "1":
             self.config_loaded = self.load_config()
@@ -115,6 +140,13 @@ class MainMenu:
                 self.view_logs()
                 self.pause()
         elif self.choice == "4":
+            if self.metrics is None or len(self.metrics.saved_logs) == 0:
+                print("\nError: No saved logs to export.")
+                self.pause()
+            else:
+                self.export_logs()
+                self.pause()
+        elif self.choice == "5":
             print("\nExiting system. Goodbye.")
             sys.exit()
         else:

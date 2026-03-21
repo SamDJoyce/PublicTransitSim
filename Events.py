@@ -104,7 +104,6 @@ class DeassignRoute(Event):
         simulator.log_event(
             f"Vehicle #{vehicle.vehicle_id} has been REMOVED from route {vehicle.route.route_id} and is now IDLE."
         )
-
         vehicle.deassign()
 
         # Check to see if there are more routes assigned
@@ -190,7 +189,7 @@ class DepartStop(Event):
     """
     def __init__(self, time: float, vehicle: Vehicle):
         super().__init__(time, vehicle)
-        self.CHANCE_OF_TRAFFIC   = 10
+        self.CHANCE_OF_TRAFFIC   = 20
         self.CHANCE_OF_BREAKDOWN = 1
         # Determine if there will be a delay before departing
         self.traffic   = random.randrange(1,100) <= self.CHANCE_OF_TRAFFIC
@@ -404,6 +403,7 @@ class CannotRepair(Event):
         current_time = self.time
         vehicle.service_end_time = current_time
         vehicle.state = State.OUT_OF_SERVICE
+        vehicle.deassign()
         # Log the event
         simulator.log_event(
             f"Vehicle #{vehicle.vehicle_id} is now OUT OF SERVICE."

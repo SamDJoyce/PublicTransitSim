@@ -1,0 +1,75 @@
+vehicles:
+  - id: B1
+    type: bus
+  - id: B2
+    type: bus
+
+routes:
+  - id: R1
+    stops:
+      - name: Stop_A
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_B
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_C
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_D
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_E
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_F
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_G
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_H
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_I
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_J
+        travel_time: null
+        min_pass: 0
+        max_pass: 0
+  - id: R2
+    stops:
+      - name: Stop_Z
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_Y
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_X
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_W
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_V
+        travel_time: 5
+        min_pass: 0
+        max_pass: 10
+      - name: Stop_U
+        travel_time: null
+        min_pass: 0
+        max_pass: 0

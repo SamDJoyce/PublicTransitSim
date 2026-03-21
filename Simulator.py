@@ -2,6 +2,7 @@ import heapq
 from typing import List
 
 from Events import Event
+from LogEntry import LogEntry
 from Passengers import Passenger
 from Routes import Route
 from Vehicles import Vehicle
@@ -18,6 +19,7 @@ class Simulator:
         self.current_time: float = 0.0
         self.event_queue  = []
         self.completed_passengers: List[Passenger] = []
+        self.completed_routes: dict[str, Route] = {}
         self.log = []
 
 
@@ -39,9 +41,9 @@ class Simulator:
         heapq.heappush(self.event_queue, event)
 
     def log_event(self, message: str):
-        log_entry = f"[Time={self.current_time:.2f}] {message}"
+        log_entry = LogEntry(self.current_time, message)
         self.log.append(log_entry)
-        print(log_entry)
+        print(log_entry.__str__())
 
     def clear_logs(self):
         self.completed_passengers = []

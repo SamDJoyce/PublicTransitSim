@@ -20,11 +20,11 @@ class Metrics:
         return len(self.saved_logs)
 
     def print_log(self, index: int):
-        for event in self.saved_logs[index -1].log:
-            print(event)
+        for event in self.saved_logs[index].event_log:
+            print(event.__str__())
 
     def print_vehicle_data(self, index: int):
-        log = self.saved_logs[index -1]
+        log = self.saved_logs[index]
         for vehicle in log.vehicles.values():
             print(f"\nVehicle: {vehicle.vehicle_id}")
             print(f"Began Service: {vehicle.service_start_time}")
@@ -37,10 +37,10 @@ class Metrics:
         print(f"Total number of vehicles: {log.num_vehicles()}")
         print(f"Total passengers carried by all vehicles: {log.total_passengers_carried()}")
         print(f"Average service time per vehicle: {log.avg_service_time():.2f}")
-        print(f"Average passengers carried per vehicle: {log.total_passengers_carried()}")
+        print(f"Average passengers carried per vehicle: {log.avg_passengers_carried()}")
 
     def print_passenger_data(self, index: int):
-        log = self.saved_logs[index -1]
+        log = self.saved_logs[index]
         print("-" * 30)
         print(f"\nCompleted Trips: {log.num_completed_trips()}")
         print("")
@@ -49,3 +49,4 @@ class Metrics:
         self.print_log(index)
         self.print_vehicle_data(index)
         self.print_passenger_data(index)
+
