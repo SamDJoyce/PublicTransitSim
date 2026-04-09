@@ -22,7 +22,7 @@ class Vehicle(ABC):
         self.current_stop_index = 0
         self.embarked_passengers: Optional[List[Passenger]] = []
         self.current_passenger_count: int = 0
-        self.total_passengers_carried = 0
+        self.total_passengers_carried: int = 0
         self.total_travel_time: float = 0.0
         self.service_start_time: float = 0.0
         self.service_end_time: float = 0.0
@@ -112,6 +112,7 @@ class Vehicle(ABC):
                 simulator.log_event(
                     f"Passenger #{passenger.passenger_id} has reached their destination: {self.current_stop().name}."
                 )
+                self.current_passenger_count -= 1
             else:
                 remaining.append(passenger)
         self.embarked_passengers = remaining
@@ -135,6 +136,49 @@ class Bus(Vehicle):
         self._dwell_time = 1.0
         self._speed      = 1.0
         self._capacity   = 60
+        self.type        = "Bus"
+
+    def dwell_time(self) -> float:
+        return self._dwell_time
+
+    def speed(self) -> float:
+        return self._speed
+
+    def capacity(self) -> int:
+        return self._capacity
+
+# ============================= #
+# ===== Double Decker Bus ===== #
+# ============================= #
+
+class DoubleDeckerBus(Vehicle):
+    def __init__(self, vehicle_id: str, route: Optional[Route] = None, ):
+        super().__init__(vehicle_id, route)
+        self._dwell_time = 1.5
+        self._speed      = 0.80
+        self._capacity   = 100
+        self.type        = "Double-Decker Bus"
+
+    def dwell_time(self) -> float:
+        return self._dwell_time
+
+    def speed(self) -> float:
+        return self._speed
+
+    def capacity(self) -> int:
+        return self._capacity
+
+# ============================= #
+# ===== Articulated Bus ===== #
+# ============================= #
+
+class Articulated(Vehicle):
+    def __init__(self, vehicle_id: str, route: Optional[Route] = None, ):
+        super().__init__(vehicle_id, route)
+        self._dwell_time = 1.25
+        self._speed      = 0.75
+        self._capacity   = 120
+        self.type        = "Articulated Bus"
 
     def dwell_time(self) -> float:
         return self._dwell_time

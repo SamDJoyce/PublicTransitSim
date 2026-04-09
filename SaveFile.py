@@ -45,14 +45,15 @@ class SaveFile:
     def _save_vehicle_data(self, log: SimulationLog):
         """
         Save vehicle data to a CSV file with columns:
-        vehicle_id, routes, service_start_time, service_end_time,
-        total_service_time, total_passengers_carried
+        vehicle_id, routes, vehicle_type, service_start_time,
+        service_end_time, total_service_time, total_passengers_carried
         :param log: The log to be saved
         """
         vehicles_file = self._format_save_name(log, "vehicles")
         with open(vehicles_file, mode="w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(["Vehicle_ID",
+                             "Vehicle_type",
                              "Routes",
                              "service_start_time",
                              "service_end_time",
@@ -61,6 +62,7 @@ class SaveFile:
             for vehicle in log.vehicles.values():
                 routes = self._format_routes(vehicle)
                 writer.writerow([vehicle.vehicle_id,
+                                 vehicle.vehicle_type,
                                  routes,
                                  vehicle.service_start_time,
                                  vehicle.service_end_time,
@@ -70,8 +72,8 @@ class SaveFile:
     def _save_passenger_data(self, log: SimulationLog):
         """
         Save passenger data to a CSV file with columns:
-        passenger_id, embark_time, disembark_time, origin, destination,
-        travel_time, wait_time, trip_time
+        passenger_id, embark_time, disembark_time, origin,
+        destination, travel_time, wait_time, trip_time
         :param log: The log to be saved
         """
         passengers_file = self._format_save_name(log, "passengers")
