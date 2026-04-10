@@ -11,6 +11,9 @@ from VehicleStates import State
 # ===== Abstract Vehicle ===== #
 # ============================ #
 class Vehicle(ABC):
+    """
+    Abstract base vehicle
+    """
     #   =============
     # || Constructor ||
     #   =============
@@ -47,21 +50,33 @@ class Vehicle(ABC):
     # || Concrete Methods ||
     #   ==================
     def current_stop(self):
+        """
+        :return: Index value of current stop
+        """
         if self.route is None:
             raise ValueError("Vehicle has no assigned route.")
         return self.route.get_stop(self.current_stop_index)
 
     def has_next_stop(self) -> bool:
+        """
+        :return: True if the current stop is not the final stop
+        """
         if self.route is None:
             raise ValueError("Vehicle has no assigned route.")
         return  self.route.has_next_stop(self.current_stop_index)
 
     def at_last_stop(self) -> bool:
+        """
+        :return: True if the current stop is the last
+        """
         if self.route is None:
             raise ValueError("Vehicle has no assigned route.")
         return self.route.is_last_stop(self.current_stop_index)
 
     def total_service_time(self) -> float:
+        """
+        :return: Duration of service time
+        """
         return self.service_end_time - self.service_start_time
 
     #   ====================
@@ -69,12 +84,15 @@ class Vehicle(ABC):
     #   ====================
 
     def has_space(self) -> bool:
+        """
+        :return: True if passenger count is less than vehicle capacity
+        """
         return (self.capacity() - self.current_passenger_count) > 0
 
     def embark_passengers(self, queue: List[Passenger], simulator) -> List[Passenger]:
         """
         Boards passengers up to vehicle capacity.
-        Returns the remaining passengers if any.
+        :return: the remaining passengers if any.
         """
         current_time = simulator.current_time
         remaining: List[Passenger] = []
@@ -98,8 +116,8 @@ class Vehicle(ABC):
 
     def disembark_passengers(self, simulator) -> List[Passenger]:
         """
-        Removes passengers from the vehicle
-        Returns a list of Passengers who have completed their trip
+        Removes passengers from the vehicle.
+        :return: a list of Passengers who have completed their trip.
         """
         current_time = simulator.current_time
         remaining: List[Passenger] = []
@@ -122,6 +140,9 @@ class Vehicle(ABC):
         self.current_stop_index = 0
 
     def deassign(self):
+        """
+        Remove the current route and reset stop index.
+        """
         self.completed_routes.append(copy.deepcopy(self.route))
         self.route = None
         self.current_stop_index = 0
@@ -131,6 +152,9 @@ class Vehicle(ABC):
 # ======================== #
 
 class Bus(Vehicle):
+    """
+    Represents a standard bus.
+    """
     def __init__(self, vehicle_id: str, route: Optional[Route] = None, ):
         super().__init__(vehicle_id, route)
         self._dwell_time = 1.0
@@ -152,6 +176,9 @@ class Bus(Vehicle):
 # ============================= #
 
 class DoubleDeckerBus(Vehicle):
+    """
+    Represents a large, two-floor bus.
+    """
     def __init__(self, vehicle_id: str, route: Optional[Route] = None, ):
         super().__init__(vehicle_id, route)
         self._dwell_time = 1.5
@@ -173,6 +200,9 @@ class DoubleDeckerBus(Vehicle):
 # ============================= #
 
 class Articulated(Vehicle):
+    """
+    Represents a large, two-segment bus.
+    """
     def __init__(self, vehicle_id: str, route: Optional[Route] = None, ):
         super().__init__(vehicle_id, route)
         self._dwell_time = 1.25

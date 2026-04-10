@@ -31,10 +31,17 @@ class Stop:
         """
         self._waiting_passengers.append(passenger)
         self.total_arrivals += 1
+
     def queue_length(self) -> int:
+        """
+        :return: count of waiting passengers
+        """
         return len(self._waiting_passengers)
 
     def has_waiting_passengers(self) -> bool:
+        """
+        :return: True if queue length > 0
+        """
         return len(self._waiting_passengers) > 0
 
     #   ==========

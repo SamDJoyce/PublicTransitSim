@@ -6,6 +6,9 @@ from Vehicles import Vehicle
 
 
 class SaveFile:
+    """
+    Saves simulation data to CSV files.
+    """
     def __init__(self, log: SimulationLog):
         self.save_dir = "sim_logs"
         self.log = log
@@ -98,12 +101,23 @@ class SaveFile:
                                  passenger.total_trip_time()])
 
     def _format_save_name(self, log, file_type: str):
+        """
+        Construct the name of the log file to be saved
+        :param log:         The log to be saved
+        :param file_type:   The type of data to be saved
+        :return:            The path of the saved file
+        """
         save_time = log.timestamp.strftime("%Y-%m-%d_%H-%M")
         file_name = file_type + "_" + save_time + ".csv"
         log_file = os.path.join(self.save_dir, file_name)
         return log_file
 
     def _format_routes(self, vehicle: Vehicle):
+        """
+        Format the route information to be saved
+        :param vehicle: The vehicle whose routes are to be formatted
+        :return:        String of all route data
+        """
         routes: str = ""
         first = True
         for route in vehicle.completed_routes:

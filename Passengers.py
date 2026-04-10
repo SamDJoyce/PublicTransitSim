@@ -37,11 +37,19 @@ class Passenger:
     #   ===============
 
     def embark(self, time: float):
+        """
+        Record the passenger's time of embarkation
+        :param time: When the passenger boarded the vehicle.
+        """
         if self.embark_time is not None:
             raise ValueError("Passenger has already embarked.")
         self.embark_time = time
 
     def disembark(self, time: float):
+        """
+        Record the passenger's time of disembarkation
+        :param time: When the passenger exited the vehicle.
+        """
         if self.embark_time is None:
             raise ValueError("Passenger cannot disembark before embarking.")
         if self.disembark_time is not None:
@@ -76,14 +84,18 @@ class Passenger:
             return None
         return self.disembark_time - self.arrival_time
 
-    def has_completed_trip(self) -> bool:
-        return self.disembark_time is not None
-
     #   =========
     # || Helpers ||
     #   =========
+
+    def has_completed_trip(self) -> bool:
+        """
+        :return: True if the passenger has recorded a disembark time.
+        """
+        return self.disembark_time is not None
+
     def at_destination(self, stop: "Stop") -> bool:
         """
-        Returns True if the provided stop is this passenger's destination.
+        :return True if the provided stop is this passenger's destination.
         """
         return self.destination_stop == stop

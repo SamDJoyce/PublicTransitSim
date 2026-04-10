@@ -68,6 +68,9 @@ class Simulator:
         self.current_time = 0.0
 
     def run(self):
+        """
+        Clear logs and begin simulation
+        """
         self.clear_logs()
         self.log_event("Starting simulation.")
         while self.event_queue:

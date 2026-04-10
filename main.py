@@ -18,11 +18,11 @@ class MainMenu:
         self.simulation_run = False
         self.config = None
         self.menu_items = [
-            "Load Configuration File",
-            "Run Simulation",
-            "View Simulation Logs",
-            "Export Simulation Logs",
-            "Exit"
+            "Load Configuration File",  #1
+            "Run Simulation",           #2
+            "View Simulation Logs",     #3
+            "Export Simulation Logs",   #4
+            "Exit"                      #5
         ]
 
     def clear_screen(self):
@@ -85,6 +85,9 @@ class MainMenu:
         ))
 
     def _print_logs(self):
+        """
+        Print a numbered list of logs.
+        """
         i = 0
         # Print a list of saved logs
         for log in self.metrics.saved_logs:
@@ -93,6 +96,10 @@ class MainMenu:
         return i
 
     def view_logs(self):
+        """
+        Print a menu for viewing logs and allow a user
+        to select an option.
+        """
         self.clear_screen()
         i = self._print_logs()
         # Print the selected log
@@ -105,6 +112,10 @@ class MainMenu:
                 print("\nInvalid selection. Please choose a valid option.")
 
     def export_logs(self):
+        """
+        Print a menu displaying currently saved logs.
+        Allows a user to select an option to export.
+        """
         self.clear_screen()
         i = self._print_logs()
         while True:
@@ -119,6 +130,9 @@ class MainMenu:
                 print("\nInvalid selection. Please choose a valid option.")
 
     def choose(self):
+        """
+        Allow the user to select an option from the main menu.
+        """
         self.choice = input("Select an option (1-5): ").strip()
         # Load config file
         if self.choice == "1":

@@ -1,4 +1,7 @@
 class LogEntry:
+    """
+    The data for a single simulation event
+    """
     def __init__(self, time, message):
         self.time: float = time
         self.message: str = message

@@ -2,6 +2,9 @@ from enum import Enum, auto
 
 
 class State(Enum):
+    """
+    All possible vehicle states.
+    """
     INIT = auto()
     IDLE = auto()
     HEADING_TO_ROUTE_START = auto()

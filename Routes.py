@@ -6,6 +6,9 @@ from Stops import Stop
 # ===== Route Class ===== #
 # ======================= #
 class Route:
+    """
+    A series of stops and their travel times
+    """
     #   =============
     # || Constructor ||
     #   =============
@@ -41,12 +44,16 @@ class Route:
         return index == len(self._stops) - 1
 
     def has_next_stop(self, index: int) -> bool:
+        """
+        :param index:
+        :return:        True if stop index is not final stop.
+        """
         return index < len(self._stops) - 1
 
     def get_travel_time(self, index: int) -> int:
         """
-        Returns the travel time from stop[index]
-        to stop[index+1]
+        :param index:
+        :return the travel time from stop[index] to stop[index+1]
         """
         stop_name = self._stops[index]
         travel_time = self._segments[stop_name]
@@ -56,6 +63,9 @@ class Route:
         return travel_time
 
     def get_total_route_duration(self):
+        """
+        :return: the total route duration
+        """
         duration = 0
         for stop, travel_time in self._segments.items():
             if travel_time is not None:
@@ -63,6 +73,10 @@ class Route:
         return duration
 
     def get_next_stop(self, index: int) -> Stop:
+        """
+        :param index:
+        :return: The stop after the stop at index provided
+        """
         if self.is_last_stop(index):
             raise ValueError("This is the final stop.")
         return self._stops[index + 1]
