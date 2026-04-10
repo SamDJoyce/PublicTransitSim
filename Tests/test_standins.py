@@ -1,4 +1,8 @@
 # test_helpers.py
+from Events import Event
+from Routes import Route
+from Stops import Stop
+
 
 class MockPassenger:
     def __init__(self, passenger_id, destination=None):
@@ -38,8 +42,52 @@ class MockRoute:
 
 class MockSimulator:
     def __init__(self):
-        self.current_time = 10
+        self.current_time = 0
+        self.events = []
         self.logs = []
+        self.completed_passengers = []
+        self.routes = []
+        self.route_index = 0
+
+    def schedule_event(self, event):
+        self.events.append(event)
 
     def log_event(self, msg):
         self.logs.append(msg)
+
+    def get_next_route(self):
+        if self.route_index < len(self.routes):
+            r = self.routes[self.route_index]
+            self.route_index += 1
+            return r
+        return None
+
+    def has_next_route(self):
+        return self.route_index < len(self.routes)
+
+    def get_time_to_next_route(self):
+        return 5  # constant for testing
+
+class MockEvent(Event):
+    def __init__(self, time, vehicle =None):
+        super().__init__(time, vehicle)
+
+    def process(self, simulator):
+        simulator.log_event(f"Processed event at {self.time}")
+
+class ChainedEvent(MockEvent):
+    def process(self, simulator):
+        super().process(simulator)
+        if self.time == 5:
+            simulator.schedule_event(MockEvent(10))
+
+def create_test_route():
+    a = Stop("A")
+    b = Stop("B")
+    c = Stop("C")
+    segments = {
+        a: 5,
+        b: 10,
+        c: None  # final stop
+    }
+    return Route(1, segments)

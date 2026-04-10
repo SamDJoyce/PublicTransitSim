@@ -29,7 +29,7 @@ class Route:
     #   =================
 
     def stops(self) -> List[Stop]:
-        return self._stops
+        return list(self._stops)
 
     def get_stop(self, index: int) -> Stop:
         return self._stops[index]

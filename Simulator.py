@@ -24,12 +24,18 @@ class Simulator:
 
 
     def get_next_route(self):
+        """
+        :return: The next available route if any
+        """
         if self.has_next_route():
             return heapq.heappop(self.route_queue)
         else:
             return None
 
     def has_next_route(self) -> bool:
+        """
+        :return: True if the simulator has a route available
+        """
         return len(self.route_queue) > 0
 
     def get_time_to_next_route(self):
@@ -38,14 +44,25 @@ class Simulator:
         return 10.0
 
     def schedule_event(self, event: Event):
+        """
+        Add an event to the simulation queue
+        :param event: The event to add
+        """
         heapq.heappush(self.event_queue, event)
 
     def log_event(self, message: str):
+        """
+        Record the details of an event in the log
+        :param message: A description of the event
+        """
         log_entry = LogEntry(self.current_time, message)
         self.log.append(log_entry)
         print(log_entry.__str__())
 
     def clear_logs(self):
+        """
+        Clear all logs
+        """
         self.completed_passengers = []
         self.log = []
         self.current_time = 0.0
