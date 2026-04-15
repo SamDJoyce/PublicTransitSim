@@ -4,6 +4,9 @@ from SimulationLog import SimulationLog
 
 
 class Metrics:
+    """
+    Collects logs and stats from simulation logs.
+    """
     def __init__(self):
         self.saved_logs: List[SimulationLog] = []
 
@@ -49,7 +52,7 @@ class Metrics:
         log = self.saved_logs[index]
         for vehicle in log.vehicles.values():
             print(f"\nVehicle: {vehicle.vehicle_id}")
-            print(f"Vehicle Type: {vehicle.vehicle_type}")
+            print(f"Vehicle Type: {vehicle.type}")
             print(f"Began Service: {vehicle.service_start_time}")
             print(f"Ended Service: {vehicle.service_end_time:.2f}")
             print(f"Total travel time: {vehicle.total_travel_time}")

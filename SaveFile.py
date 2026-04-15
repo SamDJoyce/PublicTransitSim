@@ -65,7 +65,7 @@ class SaveFile:
             for vehicle in log.vehicles.values():
                 routes = self._format_routes(vehicle)
                 writer.writerow([vehicle.vehicle_id,
-                                 vehicle.vehicle_type,
+                                 vehicle.type,
                                  routes,
                                  vehicle.service_start_time,
                                  vehicle.service_end_time,

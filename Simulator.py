@@ -39,7 +39,6 @@ class Simulator:
         return len(self.route_queue) > 0
 
     def get_time_to_next_route(self):
-        # TODO This should be dynamic
         #  current value is a placeholder
         return 10.0
 

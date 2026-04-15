@@ -5,7 +5,8 @@ import yaml
 
 from Passengers import Passenger
 from Routes import Route, Stop
-from Vehicles import Bus
+from Vehicles import Bus, DoubleDeckerBus, Articulated
+
 
 class Loader:
     """
@@ -70,7 +71,12 @@ class Loader:
             if vehicle_type == "bus":
                 vehicle = Bus(vehicle_id)
                 print("Bus #" + str(vehicle_id) + " loaded.")
-            # TODO add ability to recognize more vehicle types
+            elif vehicle_type == "Double-Decker Bus":
+                vehicle = DoubleDeckerBus(vehicle_id)
+                print("Double-Decker Bus #" + str(vehicle_id) + " loaded.")
+            elif vehicle_type == "Articulated Bus":
+                vehicle = Articulated(vehicle_id)
+                print("Articulated Bus #" + str(vehicle_id) + " loaded.")
             else:
                 raise ValueError(f"Unknown vehicle type: {vehicle_type}")
 
@@ -106,7 +112,7 @@ class Loader:
                     passenger_id = self.passenger_counter,
                     origin_stop = origin_stop,
                     destination_stop = destination_stop,
-                    arrival_time = 0  # TODO can randomize later
+                    arrival_time = 0
                 )
                 # Increment counter
                 self.passenger_counter += 1

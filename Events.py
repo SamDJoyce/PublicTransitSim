@@ -256,23 +256,9 @@ class FinalDwellComplete(Event):
         simulator.log_event(
             f"Vehicle #{vehicle.vehicle_id} has been COMPLETED its current route, {vehicle.route.route_id}."
         )
-        # TODO add possibility of route repeats,
-        #  ie perform the same route 3 times in a row
-        #  would schedule RestartRoute event
         simulator.schedule_event(
             DeassignRoute(current_time, vehicle)
         )
-
-class RestartRoute(Event):
-    """
-    Begin the same route again, from the first stop.
-    """
-    def __init__(self, time: float, vehicle: Vehicle):
-        super().__init__(time, vehicle)
-
-    def process(self, simulator):
-        pass #TODO
-
 
 class EndService(Event):
     """
